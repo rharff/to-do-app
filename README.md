@@ -31,7 +31,25 @@ The backend is fully implemented and ready to use:
 
 ## 🚀 Quick Start
 
-### Option 1: Full Stack Setup (Recommended)
+### Option 1: Docker (Easiest - Recommended for Production)
+
+```bash
+# One-command setup
+./docker-start.sh
+
+# Or manually
+cp .env.docker .env
+docker-compose up -d
+```
+
+**Access:**
+- Frontend: http://localhost
+- Backend: http://localhost:3000
+- Database: Automatically configured
+
+See [DOCKER_GUIDE.md](./DOCKER_GUIDE.md) for detailed Docker documentation.
+
+### Option 2: Full Stack Setup (Development)
 
 **1. Setup Backend:**
 ```bash
@@ -66,7 +84,7 @@ npm run dev
 - Backend API: http://localhost:3000/api
 - Health Check: http://localhost:3000/health
 
-### Option 2: Frontend Only (Local State Mode)
+### Option 3: Frontend Only (Local State Mode)
 
 ```bash
 cd frontend
@@ -76,17 +94,12 @@ npm run dev
 
 The app will run with local state - no backend needed!
 
-See [INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md) for detailed setup instructions.
-
 
 ## 📚 Documentation
 
-- **[INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md)** - Complete setup and integration guide
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Visual architecture diagram and data flow
-- **[BACKEND_API_SPEC.md](./BACKEND_API_SPEC.md)** - Complete API specification
+- **[DOCKER_GUIDE.md](./DOCKER_GUIDE.md)** - Complete Docker deployment guide
 - **[backend/README.md](./backend/README.md)** - Backend documentation and API reference
 - **[frontend/API_INTEGRATION.md](./frontend/API_INTEGRATION.md)** - Frontend integration guide
-- **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Quick reference card
 
 ## 🏗️ Project Structure
 
