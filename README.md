@@ -1,12 +1,12 @@
 # Kanban To-Do Application
 
-A modern, feature-rich Kanban board application with a React frontend ready for backend API integration.
+A modern, feature-rich full-stack Kanban board application with React frontend and Express.js backend.
 
 ## 🎯 Project Status
 
-### ✅ Frontend - READY FOR API INTEGRATION
+### ✅ Frontend - COMPLETE
 
-The frontend is **fully prepared** to connect with a backend API. All necessary infrastructure is in place:
+The frontend is fully functional with API integration support:
 
 - ✅ API service layer with all CRUD operations
 - ✅ Axios HTTP client configured
@@ -16,13 +16,57 @@ The frontend is **fully prepared** to connect with a backend API. All necessary 
 - ✅ Vite proxy for development
 - ✅ Environment configuration
 
-### ⏳ Backend - NEEDS IMPLEMENTATION
+### ✅ Backend - COMPLETE
 
-The backend needs to be built according to the API specification.
+The backend is fully implemented and ready to use:
+
+- ✅ Express.js REST API
+- ✅ PostgreSQL database with schema
+- ✅ All CRUD endpoints for boards, columns, tasks
+- ✅ CORS configuration
+- ✅ Error handling and validation
+- ✅ Database migrations and sample data
+- ✅ Comprehensive documentation
+
 
 ## 🚀 Quick Start
 
-### Option 1: Run Frontend Only (Local State Mode)
+### Option 1: Full Stack Setup (Recommended)
+
+**1. Setup Backend:**
+```bash
+# Automated setup
+./setup-backend.sh
+
+# Or manual setup
+cd backend
+npm install
+cp .env.example .env
+# Edit .env with your database credentials
+createdb kanban_db
+psql -U postgres -d kanban_db -f database/schema.sql
+npm run dev
+```
+
+**2. Setup Frontend:**
+```bash
+cd frontend
+npm install
+npm install axios
+
+# Enable API mode
+# Edit src/context/KanbanContext.tsx
+# Change: const USE_API = true;
+
+npm run dev
+```
+
+**3. Access Application:**
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3000/api
+- Health Check: http://localhost:3000/health
+
+### Option 2: Frontend Only (Local State Mode)
 
 ```bash
 cd frontend
@@ -32,42 +76,17 @@ npm run dev
 
 The app will run with local state - no backend needed!
 
-### Option 2: Full Stack (When Backend is Ready)
+See [INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md) for detailed setup instructions.
 
-1. **Install axios** (one-time setup):
-   ```bash
-   ./setup-api.sh
-   ```
-   Or manually:
-   ```bash
-   cd frontend
-   npm install axios
-   ```
-
-2. **Enable API mode**:
-   ```typescript
-   // frontend/src/context/KanbanContext.tsx
-   const USE_API = true;  // Change from false to true
-   ```
-
-3. **Start backend**:
-   ```bash
-   cd backend
-   npm install
-   npm start  # Should run on http://localhost:3000
-   ```
-
-4. **Start frontend**:
-   ```bash
-   cd frontend
-   npm run dev  # Runs on http://localhost:5173
-   ```
 
 ## 📚 Documentation
 
+- **[INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md)** - Complete setup and integration guide
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Visual architecture diagram and data flow
-- **[BACKEND_API_SPEC.md](./BACKEND_API_SPEC.md)** - Complete API specification for backend developers
-- **[frontend/API_INTEGRATION.md](./frontend/API_INTEGRATION.md)** - Detailed frontend integration guide
+- **[BACKEND_API_SPEC.md](./BACKEND_API_SPEC.md)** - Complete API specification
+- **[backend/README.md](./backend/README.md)** - Backend documentation and API reference
+- **[frontend/API_INTEGRATION.md](./frontend/API_INTEGRATION.md)** - Frontend integration guide
+- **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Quick reference card
 
 ## 🏗️ Project Structure
 

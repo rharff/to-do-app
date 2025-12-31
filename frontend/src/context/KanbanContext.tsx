@@ -4,7 +4,7 @@ import type { Board, Column, Task } from '../types/kanban';
 import api from '../services/api';
 
 // Feature flag: Set to true to use API, false to use local state
-const USE_API = false; // Toggle this when backend is ready
+const USE_API = true; // Toggle this when backend is ready
 
 interface KanbanContextType {
   boards: Board[];
@@ -53,7 +53,8 @@ export const KanbanProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     if (USE_API) {
       refreshData();
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   // Refresh all data from API
   const refreshData = React.useCallback(async () => {
@@ -95,17 +96,9 @@ export const KanbanProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         const newBoard = await api.boards.create(board);
         setBoards(prev => [...prev, newBoard]);
 
-        // Create default columns for the new board
-        const defaultColumns = [
-          { boardId: newBoard.id, title: 'To Do', order: 0 },
-          { boardId: newBoard.id, title: 'In Progress', order: 1 },
-          { boardId: newBoard.id, title: 'Done', order: 2 },
-        ];
-
-        const createdColumns = await Promise.all(
-          defaultColumns.map(col => api.columns.create(col))
-        );
-        setColumns(prev => [...prev, ...createdColumns]);
+        // Backend automatically creates default columns, so we just need to fetch them
+        const boardColumns = await api.columns.getByBoardId(newBoard.id);
+        setColumns(prev => [...prev, ...boardColumns]);
       } catch (err) {
         console.error('Error creating board:', err);
         throw err;

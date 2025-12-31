@@ -3,21 +3,33 @@ import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Layout, Github, ArrowRight, Loader2 } from "lucide-react"
+import { Layout, Github, ArrowRight, Loader2, AlertCircle } from "lucide-react"
+import { useAuth } from "@/context/AuthContext"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function LoginPage() {
+  const { login } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
-  async function onSubmit(event: React.FormEvent) {
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsLoading(true)
+    setError(null)
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
+    const formData = new FormData(event.currentTarget)
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+
+    try {
+      await login(email, password)
       navigate("/dashboard")
-    }, 1000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid email or password")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -69,12 +81,21 @@ export default function LoginPage() {
                 </span>
               </div>
             </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             <form onSubmit={onSubmit}>
               <div className="grid gap-4">
                 <div className="grid gap-2">
                   <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Email</label>
                   <Input
                     id="email"
+                    name="email"
                     placeholder="name@example.com"
                     type="email"
                     autoCapitalize="none"
@@ -93,6 +114,7 @@ export default function LoginPage() {
                   </div>
                   <Input
                     id="password"
+                    name="password"
                     type="password"
                     disabled={isLoading}
                     required

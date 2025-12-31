@@ -16,11 +16,11 @@ interface TaskDetailDialogProps {
     task: Task | null;
     isOpen: boolean;
     onClose: () => void;
-    onUpdate: (taskId: string, updates: Partial<Task>) => void;
-    onCreate: (task: Omit<Task, 'id'>) => void;
-    onDelete: (taskId: string) => void;
+    onUpdate: (taskId: string, updates: Partial<Task>) => Promise<void>;
+    onCreate: (task: Omit<Task, 'id'>) => Promise<void>;
+    onDelete: (taskId: string) => Promise<void>;
     columns: Column[];
-    onMoveTask: (taskId: string, newColumnId: string) => void;
+    onMoveTask: (taskId: string, newColumnId: string) => Promise<void>;
     defaultColumnId?: string;
     boards?: Board[]; // Optional list of boards to resolve column ownership
 }
@@ -74,40 +74,49 @@ export function TaskDetailDialog({
         }
     }, [task, isOpen, defaultColumnId, columns]);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!title.trim() || !columnId) return;
 
-        if (task) {
-            // Update existing
-            onUpdate(task.id, {
-                title,
-                description,
-                priority,
-                dueDate: dueDate ? dueDate.toDateString() : undefined,
-            });
+        try {
+            if (task) {
+                // Update existing
+                await onUpdate(task.id, {
+                    title,
+                    description,
+                    priority,
+                    dueDate: dueDate ? dueDate.toDateString() : undefined,
+                });
 
-            if (columnId !== task.columnId) {
-                onMoveTask(task.id, columnId);
+                if (columnId !== task.columnId) {
+                    await onMoveTask(task.id, columnId);
+                }
+            } else {
+                // Create new
+                await onCreate({
+                    title,
+                    description,
+                    priority,
+                    dueDate: dueDate ? dueDate.toDateString() : undefined,
+                    columnId,
+                });
             }
-        } else {
-            // Create new
-            onCreate({
-                title,
-                description,
-                priority,
-                dueDate: dueDate ? dueDate.toDateString() : undefined,
-                columnId,
-            });
-        }
 
-        onClose();
+            onClose();
+        } catch (error) {
+            console.error('Failed to save task:', error);
+            // You might want to show an error message to the user
+        }
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (!task) return;
         if (confirm("Are you sure you want to delete this task?")) {
-            onDelete(task.id);
-            onClose();
+            try {
+                await onDelete(task.id);
+                onClose();
+            } catch (error) {
+                console.error('Failed to delete task:', error);
+            }
         }
     };
 

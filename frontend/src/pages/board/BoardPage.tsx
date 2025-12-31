@@ -77,16 +77,21 @@ export default function BoardPage() {
     }
   }, [boardId, markBoardAsViewed]);
 
-  const handleAddColumn = () => {
+  const handleAddColumn = async () => {
     if (!newColumnTitle.trim() || !boardId) return;
 
-    addColumn({
-      boardId,
-      title: newColumnTitle,
-      order: columns.length,
-    });
-    setNewColumnTitle("");
-    setIsAddingColumn(false);
+    try {
+      await addColumn({
+        boardId,
+        title: newColumnTitle,
+        order: columns.length,
+      });
+      setNewColumnTitle("");
+      setIsAddingColumn(false);
+    } catch (error) {
+      console.error('Failed to add column:', error);
+      // You might want to show an error message to the user here
+    }
   };
 
   const handleTaskClick = (task: Task) => {
@@ -164,26 +169,26 @@ export default function BoardPage() {
       }
       return;
     }
-    
+
     // Task Dragging (Reordering in same column is handled here effectively)
     // Dropping a task over another task or column
     const isActiveTask = active.data.current?.type === "Task";
     if (isActiveTask) {
-        // If we dropped over a column, it's already handled in onDragOver for moving *between* columns.
-        // But for reordering *within* a column, we might need logic here if onDragOver didn't cover it?
-        // dnd-kit's SortableContext handles the reordering via state updates, but we need to persist it.
-        // Wait, onDragOver moves the task to the new column. 
-        // We still need to persist the new index if it's in the same column or new column.
-        // My moveTask context function might handle "move to column" but maybe not "reorder in column"?
-        // Typically moveTask(taskId, newColumnId) updates the column.
-        // If the context doesn't support manual ordering, we might be limited.
-        // Assuming moveTask handles column changes.
-        // If the backend/context supports ordering, we would need a `reorderTask(taskId, newIndex, newColumnId)`.
-        // The provided code used `moveTask(activeTask.id, overColumn.id)` in `onDragOver`.
-        // Let's assume for now `moveTask` just puts it at the end or we rely on `SortableContext` visual but 
-        // we might be missing the "reorder" persistence.
-        // Given the instructions "rebuild... difficult drag & drop", I should ensure `onDragOver` is smooth.
-        // I will keep existing logic for `onDragOver` which handles column switching.
+      // If we dropped over a column, it's already handled in onDragOver for moving *between* columns.
+      // But for reordering *within* a column, we might need logic here if onDragOver didn't cover it?
+      // dnd-kit's SortableContext handles the reordering via state updates, but we need to persist it.
+      // Wait, onDragOver moves the task to the new column. 
+      // We still need to persist the new index if it's in the same column or new column.
+      // My moveTask context function might handle "move to column" but maybe not "reorder in column"?
+      // Typically moveTask(taskId, newColumnId) updates the column.
+      // If the context doesn't support manual ordering, we might be limited.
+      // Assuming moveTask handles column changes.
+      // If the backend/context supports ordering, we would need a `reorderTask(taskId, newIndex, newColumnId)`.
+      // The provided code used `moveTask(activeTask.id, overColumn.id)` in `onDragOver`.
+      // Let's assume for now `moveTask` just puts it at the end or we rely on `SortableContext` visual but 
+      // we might be missing the "reorder" persistence.
+      // Given the instructions "rebuild... difficult drag & drop", I should ensure `onDragOver` is smooth.
+      // I will keep existing logic for `onDragOver` which handles column switching.
     }
   }
 
@@ -246,7 +251,7 @@ export default function BoardPage() {
               {board.title}
             </h1>
             <p className="text-[11px] text-muted-foreground hidden sm:block font-medium tracking-tight">
-               {stats.total} Tasks &bull; {stats.highPriority} High Priority
+              {stats.total} Tasks &bull; {stats.highPriority} High Priority
             </p>
           </div>
           <Button variant="ghost" size="icon" className="ml-2 text-muted-foreground">
@@ -257,14 +262,14 @@ export default function BoardPage() {
         <div className="flex items-center gap-3">
           {/* Quick Stats/Filters */}
           <div className="hidden md:flex items-center gap-4 mr-4 text-xs font-medium text-muted-foreground border-r pr-6 h-8">
-              <div className="flex items-center gap-1.5">
-                  <Layout className="h-3.5 w-3.5" />
-                  <span>{columns.length} Columns</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-orange-600 dark:text-orange-400">
-                  <AlertCircle className="h-3.5 w-3.5" />
-                  <span>{stats.highPriority} Urgent</span>
-              </div>
+            <div className="flex items-center gap-1.5">
+              <Layout className="h-3.5 w-3.5" />
+              <span>{columns.length} Columns</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-orange-600 dark:text-orange-400">
+              <AlertCircle className="h-3.5 w-3.5" />
+              <span>{stats.highPriority} Urgent</span>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">

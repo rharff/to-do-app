@@ -3,21 +3,34 @@ import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Layout, Github, Loader2, ArrowRight } from "lucide-react"
+import { Layout, Github, Loader2, ArrowRight, AlertCircle } from "lucide-react"
+import { useAuth } from "@/context/AuthContext"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function RegisterPage() {
+  const { register } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
-  async function onSubmit(event: React.FormEvent) {
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsLoading(true)
+    setError(null)
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
+    const formData = new FormData(event.currentTarget)
+    const name = formData.get("name") as string
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+
+    try {
+      await register(email, password, name)
       navigate("/dashboard")
-    }, 1000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -69,12 +82,21 @@ export default function RegisterPage() {
                 </span>
               </div>
             </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             <form onSubmit={onSubmit}>
               <div className="grid gap-4">
                 <div className="grid gap-2">
                    <label htmlFor="name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Full Name</label>
                   <Input
                     id="name"
+                    name="name"
                     placeholder="John Doe"
                     type="text"
                     disabled={isLoading}
@@ -85,6 +107,7 @@ export default function RegisterPage() {
                   <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Email</label>
                   <Input
                     id="email"
+                    name="email"
                     placeholder="name@example.com"
                     type="email"
                     autoCapitalize="none"
@@ -98,6 +121,7 @@ export default function RegisterPage() {
                   <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Password</label>
                   <Input
                     id="password"
+                    name="password"
                     type="password"
                     disabled={isLoading}
                     required
